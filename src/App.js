@@ -49,6 +49,7 @@ function App() {
     color: '#333'
   });
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight
@@ -89,14 +90,32 @@ function App() {
     e.preventDefault();
     if (name.trim() === '') return;
 
-    // Play birthday tune
-    try {
-      if (audioRef.current) {
-        audioRef.current.play().catch(err => console.log("Audio play failed:", err));
+    // Create and play audio - more robust approach
+    const audio = new Audio(birthdayTune);
+    audio.volume = 0.7; // 70% volume
+    
+    // Try multiple approaches to play the audio
+    const playAudio = () => {
+      const playPromise = audio.play();
+      
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            console.log("Audio playing successfully");
+          })
+          .catch(err => {
+            console.log("Audio play failed:", err);
+            // Try again with user interaction
+            if (audioRef.current) {
+              audioRef.current.play()
+                .catch(e => console.log("Backup audio also failed:", e));
+            }
+          });
       }
-    } catch (error) {
-      console.log("Audio error:", error);
-    }
+    };
+    
+    // Play the audio
+    playAudio();
 
     // Set random message
     setMessage(generateMessage());
@@ -166,6 +185,35 @@ function App() {
     }
   };
 
+  // Play music manually
+  const playMusic = () => {
+    if (audioRef.current) {
+      audioRef.current.volume = 0.7;
+      audioRef.current.currentTime = 0; // Start from beginning
+      const playPromise = audioRef.current.play();
+      
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            console.log("Audio playing successfully");
+            setIsPlaying(true);
+          })
+          .catch(err => {
+            console.log("Manual audio play failed:", err);
+            setIsPlaying(false);
+          });
+      }
+    }
+  };
+
+  // Pause music
+  const pauseMusic = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    }
+  };
+
   // Check for URL params on load
   React.useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
@@ -184,7 +232,7 @@ function App() {
       background: showWish ? backgroundTheme.background : 'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)',
       color: showWish ? backgroundTheme.color : '#333'
     }}>
-      <audio ref={audioRef} src={birthdayTune} />
+      <audio ref={audioRef} src={birthdayTune} preload="auto" />
       
       <div className="theme-toggle" onClick={toggleDarkMode}>
         {darkMode ? <FaSun /> : <FaMoon />}
@@ -236,6 +284,14 @@ function App() {
 
             <div className="action-buttons">
               <button onClick={handleReset} className="btn reset-btn">Create New Wish</button>
+              
+              <button 
+                onClick={isPlaying ? pauseMusic : playMusic} 
+                className="btn music-btn"
+                style={{ marginLeft: '10px' }}
+              >
+                {isPlaying ? 'Pause Music' : 'Play Music'}
+              </button>
               
               {shareUrl && (
                 <div className="share-container">
