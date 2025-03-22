@@ -7,8 +7,8 @@ import html2canvas from 'html2canvas';
 // Birthday card image - using a reliable image URL
 const birthdayImage = "https://www.pngmart.com/files/1/Birthday-Cake-PNG-File.png";
 
-// Birthday tune - using direct MP3 link
-const birthdayTune = "https://dl.dropboxusercontent.com/s/1cdv9ht8jblpi5z/happy-birthday-song.mp3";
+// Birthday tune - using local file from public folder
+const birthdayTune = "/happy-birthday-to-you-background-music-for-the-holiday-jazz-version-316322.mp3";
 
 // Birthday messages array
 const birthdayMessages = [
