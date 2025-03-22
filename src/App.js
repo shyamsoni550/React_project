@@ -7,8 +7,8 @@ import html2canvas from 'html2canvas';
 // Birthday card image - using a reliable image URL
 const birthdayImage = "https://www.pngmart.com/files/1/Birthday-Cake-PNG-File.png";
 
-// Birthday tune
-const birthdayTune = "https://cdn.pixabay.com/download/audio/2023/07/11/audio_7bc34a1d10.mp3";
+// Birthday tune - using direct MP3 link
+const birthdayTune = "https://dl.dropboxusercontent.com/s/1cdv9ht8jblpi5z/happy-birthday-song.mp3";
 
 // Birthday messages array
 const birthdayMessages = [
@@ -56,6 +56,7 @@ function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [shareUrl, setShareUrl] = useState('');
   const [copySuccess, setCopySuccess] = useState('');
+  const [showMusicButton, setShowMusicButton] = useState(false);
   const wishCardRef = useRef(null);
   const audioRef = useRef(null);
 
@@ -180,10 +181,19 @@ function App() {
           const playPromise = audioRef.current.play();
           
           if (playPromise !== undefined) {
-            playPromise.catch(err => {
-              console.log("Autoplay prevented by browser:", err);
-              // Silently fail - no user notification needed
-            });
+            playPromise
+              .then(() => {
+                console.log("Audio playing successfully");
+                setShowMusicButton(false);
+              })
+              .catch(err => {
+                console.log("Autoplay prevented by browser:", err);
+                // Show play button when autoplay fails
+                setShowMusicButton(true);
+              });
+          } else {
+            // Older browsers might not return a promise
+            setShowMusicButton(true);
           }
         }
       }, 500);
@@ -194,6 +204,21 @@ function App() {
       }
     }
   }, [showWish]);
+
+  // Manual play music function
+  const playMusic = () => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.volume = 0.7;
+      audioRef.current.play()
+        .then(() => {
+          setShowMusicButton(false);
+        })
+        .catch(err => {
+          console.log("Manual play failed:", err);
+        });
+    }
+  };
 
   return (
     <div className={`app ${darkMode ? 'dark-mode' : 'light-mode'}`} style={{ 
@@ -252,6 +277,16 @@ function App() {
 
             <div className="action-buttons">
               <button onClick={handleReset} className="btn reset-btn">Create New Wish</button>
+              
+              {showMusicButton && (
+                <button 
+                  onClick={playMusic} 
+                  className="btn music-btn"
+                  style={{ marginLeft: '10px', background: '#ff9a9e' }}
+                >
+                  Play Birthday Song 🎵
+                </button>
+              )}
               
               {shareUrl && (
                 <div className="share-container">
