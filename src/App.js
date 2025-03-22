@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import Confetti from 'react-confetti';
 import './App.css';
 import { FaSun, FaMoon, FaShare, FaDownload } from 'react-icons/fa';
@@ -24,29 +24,26 @@ const birthdayMessages = [
   "May all life's blessings be yours, on your birthday and always!"
 ];
 
-// Background themes by month
-const backgroundThemes = {
-  '01': { background: 'linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)', color: '#333' }, // January
-  '02': { background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', color: '#fff' }, // February
-  '03': { background: 'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)', color: '#333' }, // March
-  '04': { background: 'linear-gradient(135deg, #fad0c4 0%, #ffd1ff 100%)', color: '#333' }, // April
-  '05': { background: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)', color: '#333' }, // May
-  '06': { background: 'linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)', color: '#333' }, // June
-  '07': { background: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)', color: '#333' }, // July
-  '08': { background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', color: '#333' }, // August
-  '09': { background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: '#fff' }, // September
-  '10': { background: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)', color: '#333' }, // October
-  '11': { background: 'linear-gradient(135deg, #cfd9df 0%, #e2ebf0 100%)', color: '#333' }, // November
-  '12': { background: 'linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)', color: '#333' }  // December
-};
+// Random background themes
+const backgroundThemes = [
+  { background: 'linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)', color: '#333' },
+  { background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', color: '#fff' },
+  { background: 'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)', color: '#333' },
+  { background: 'linear-gradient(135deg, #fad0c4 0%, #ffd1ff 100%)', color: '#333' },
+  { background: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)', color: '#333' },
+  { background: 'linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)', color: '#333' },
+  { background: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)', color: '#333' },
+  { background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', color: '#333' },
+  { background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: '#fff' },
+  { background: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)', color: '#333' },
+  { background: 'linear-gradient(135deg, #cfd9df 0%, #e2ebf0 100%)', color: '#333' },
+  { background: 'linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)', color: '#333' }
+];
 
 function App() {
   const [name, setName] = useState('');
   const [message, setMessage] = useState('');
   const [showWish, setShowWish] = useState(false);
-  const [countdown, setCountdown] = useState(null);
-  const [timeRemaining, setTimeRemaining] = useState(null);
-  const [birthdayDate, setBirthdayDate] = useState('');
   const [backgroundTheme, setBackgroundTheme] = useState({
     background: 'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)',
     color: '#333'
@@ -63,7 +60,7 @@ function App() {
   const audioRef = useRef(null);
 
   // Handle window resize for confetti
-  useEffect(() => {
+  React.useEffect(() => {
     const handleResize = () => {
       setWindowSize({
         width: window.innerWidth,
@@ -75,48 +72,19 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Calculate time remaining for birthday
-  useEffect(() => {
-    if (!countdown) return;
-
-    const timer = setInterval(() => {
-      const now = new Date().getTime();
-      const distance = countdown - now;
-
-      if (distance < 0) {
-        clearInterval(timer);
-        setTimeRemaining("It's your birthday today!");
-        return;
-      }
-
-      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-      setTimeRemaining(`${days}d ${hours}h ${minutes}m ${seconds}s`);
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [countdown]);
-
-  // Set background theme based on selected month
-  useEffect(() => {
-    if (birthdayDate) {
-      const month = birthdayDate.split('-')[1]; // Extract month from YYYY-MM-DD
-      if (backgroundThemes[month]) {
-        setBackgroundTheme(backgroundThemes[month]);
-      }
-    }
-  }, [birthdayDate]);
-
   // Generate random birthday message
   const generateMessage = () => {
     const randomIndex = Math.floor(Math.random() * birthdayMessages.length);
     return birthdayMessages[randomIndex];
   };
 
-  // Handle form submission
+  // Get random background theme
+  const getRandomBackgroundTheme = () => {
+    const randomIndex = Math.floor(Math.random() * backgroundThemes.length);
+    return backgroundThemes[randomIndex];
+  };
+
+  // Handle form submission - Directly celebrate birthday
   const handleSubmit = (e) => {
     e.preventDefault();
     if (name.trim() === '') return;
@@ -132,19 +100,17 @@ function App() {
 
     // Set random message
     setMessage(generateMessage());
+    
+    // Set random background theme
+    setBackgroundTheme(getRandomBackgroundTheme());
+    
+    // Show celebration
     setShowWish(true);
     setImageLoaded(false); // Reset image loaded state
-
-    // Set countdown if birthday date is provided
-    if (birthdayDate) {
-      const targetDate = new Date(birthdayDate).getTime();
-      setCountdown(targetDate);
-    }
 
     // Generate share URL
     const params = new URLSearchParams();
     params.set('name', name);
-    if (birthdayDate) params.set('date', birthdayDate);
     const shareableUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
     setShareUrl(shareableUrl);
   };
@@ -154,9 +120,6 @@ function App() {
     setName('');
     setMessage('');
     setShowWish(false);
-    setCountdown(null);
-    setTimeRemaining(null);
-    setBirthdayDate('');
     setShareUrl('');
     setCopySuccess('');
   };
@@ -204,21 +167,15 @@ function App() {
   };
 
   // Check for URL params on load
-  useEffect(() => {
+  React.useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
     const nameParam = queryParams.get('name');
-    const dateParam = queryParams.get('date');
     
     if (nameParam) {
       setName(nameParam);
       setMessage(generateMessage());
+      setBackgroundTheme(getRandomBackgroundTheme());
       setShowWish(true);
-      
-      if (dateParam) {
-        setBirthdayDate(dateParam);
-        const targetDate = new Date(dateParam).getTime();
-        setCountdown(targetDate);
-      }
     }
   }, []);
 
@@ -259,17 +216,7 @@ function App() {
               />
             </div>
 
-            <div className="form-group">
-              <label htmlFor="birthday">Birthday Date (optional):</label>
-              <input
-                type="date"
-                id="birthday"
-                value={birthdayDate}
-                onChange={(e) => setBirthdayDate(e.target.value)}
-              />
-            </div>
-
-            <button type="submit" className="btn">Generate Birthday Wish</button>
+            <button type="submit" className="btn">Celebrate Birthday!</button>
           </form>
         ) : (
           <div className="wish-container">
@@ -286,13 +233,6 @@ function App() {
             </div>
             <h2>Happy Birthday, {name}! 🎉</h2>
             <p className="message">{message}</p>
-
-            {timeRemaining && (
-              <div className="countdown">
-                <h3>Countdown to Birthday:</h3>
-                <p className="timer">{timeRemaining}</p>
-              </div>
-            )}
 
             <div className="action-buttons">
               <button onClick={handleReset} className="btn reset-btn">Create New Wish</button>
