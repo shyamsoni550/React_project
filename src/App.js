@@ -8,7 +8,7 @@ import html2canvas from 'html2canvas';
 const birthdayImage = "https://www.pngmart.com/files/1/Birthday-Cake-PNG-File.png";
 
 // Birthday tune
-const birthdayTune = "https://assets.mixkit.co/active_storage/sfx/2758/2758-preview.mp3";
+const birthdayTune = "https://cdn.pixabay.com/download/audio/2023/07/11/audio_7bc34a1d10.mp3";
 
 // Birthday messages array
 const birthdayMessages = [
